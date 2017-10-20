@@ -1,0 +1,30 @@
+{
+  "manifest_version": 2,
+  "name": "CSGOSum Helper",
+  "version": "1.0.0",
+  "description" : "Description",
+  "permissions": [
+    "tabs", // Доступ к объекту Tabs
+    "activeTab", // Доступ к объекту ActiveTabs
+    "storage",
+    "https://www.csgosum.com/*",
+    "http://csgoback.net/api/*"
+  ],
+  "icons": { "16": "img/csgosum-logo.png",
+             "48": "img/csgosum-logo.png",
+             "128": "img/csgosum-logo.png" 
+           },
+  "background": {
+    "scripts": ["js/jquery-3.2.1.min.js","background.js"]
+  },
+    
+  "browser_action": {
+    "default_title": "CSGO Helper", // Заголовок, который отображается при наведении
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [{
+      "matches": ["https://www.csgosum.com/"],
+      "css": ["css/content.css"],
+      "js": ["js/jquery-3.2.1.min.js", "js/content.js"]
+  }]
+}
