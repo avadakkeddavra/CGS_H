@@ -5,12 +5,13 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
         case 'getServiceList':
             
             $.ajax({
-                url:'http://csgoback.net/api/extension?extension=csgoroll-helper&type=subscription&subType=default',
+                url:'http://csgoback.net/api/extension?extension=csgosum-helper&type=subscription&subType=default',
                 type:'GET',
                 dataType:'json',
                 success:function(response){
-                   console.log(response.favourite);
-                   localStorage.setItem('csgoback_services', response.serviceList);
+                    
+                   var services = JSON.stringify(response.servicesData);
+                   localStorage.setItem('csgoback_services', services);
                    localStorage.setItem('csgoback_favourite', JSON.stringify(response.favourite));
                    
                 }
@@ -25,7 +26,7 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
         case 'getServiceArray':
             var service = request.service;
                 $.ajax({
-                    url:'http://csgoback.net/api/extension?extension=csgoroll-helper&type=subscription&subType=loadPrice&service='+service+'&updateTime=60',
+                    url:'http://csgoback.net/api/extension?extension=csgosum-helper&type=subscription&subType=loadPrice&service='+service+'&updateTime=60',
                     type:'GET',
                     dataType:'json',
                     success:function(response){
