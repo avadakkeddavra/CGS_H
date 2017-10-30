@@ -50,60 +50,86 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
             break;
             
         case 'addToFavorites':
-            var name = request.name;
-            $.ajax({
-                  url: 'http://csgoback.net/ajax/favourite-edit',
-                  type: 'POST',
-                  dataType: 'json',
-                  headers: {
-                      "X-Requested-With": "XMLHttpRequest"
-                  },
-                  data: {
-                      type: 'add',
-                      service: 'csgosum_plugin',
-                      itemName: name
-                  },
-                  success: function(response){
-                      if(response.success == true){
-                          localStorage.setItem('favouriteResponse',true);
-                          localStorage.setItem('favouriteID', response.favouriteId);
-                      }else{
-                          localStorage.setItem('favouriteResponse',false);
-                      }
-                  }
-              });
-            var data = [];
-            data[0] = localStorage.getItem('favouriteResponse');
-            data[1] = localStorage.getItem('favouriteID');
-            sendResponse(Array(localStorage.getItem('favouriteResponse'),localStorage.getItem('favouriteID'))); 
-            localStorage.removeItem('favouriteResponse');
-            localStorage.removeItem('favouriteID')
             
+            var name = request.name;
+            var xhr = new XMLHttpRequest();
+            var data = {
+                type: 'add',
+                service:'csgosum_plugin',
+                itemName: name
+            }
+            var boundary = String(Math.random()).slice(2);
+            var boundaryMiddle = '--' + boundary + '\r\n';
+            var boundaryLast = '--' + boundary + '--\r\n';
+            var body = ['\r\n'];
+            for (var key in data) {
+              // добавление поля
+              body.push('Content-Disposition: form-data; name="' + key + '"\r\n\r\n' + data[key] + '\r\n');
+            }
+            
+            body = body.join(boundaryMiddle) + boundaryLast;
+            
+            xhr.open('POST',  'http://csgoback.net/ajax/favourite-edit', false);
+            xhr.setRequestHeader('Content-Type', 'multipart/form-data; boundary=' + boundary);
+            
+            xhr.send(body);
+            
+           
+                    if (xhr.status != 200) {
+                       // обработать ошибку
+                       sendResponse({
+                           action: "NotauthorizeInPage"
+                       })
+                   } else {
+
+                     var response =  JSON.parse(xhr.response);
+                       console.log(response);
+                     sendResponse(response);
+
+                   }
+            
+            return (true);
+                        
             break;
         case 'removeFavourite':
-            var id = request.id;
-                $.ajax({
-                  url: 'http://csgoback.net/ajax/favourite-edit',
-                  type: 'POST',
-                  dataType: 'json',
-                  headers: {
-                      "X-Requested-With": "XMLHttpRequest"
-                  },
-                  data: {
-                      type: 'remove',
-                      service: 'csgosum_plugin',
-                      itemId: id,
-                  },
-                  success: function(response){
-                      
-                    localStorage.removeItem('deleteFavourite')
-                    localStorage.setItem('deleteFavourite', response.success);
-                      
-                  }
-              });
+            var id = request.id;            
+            var xhr = new XMLHttpRequest();
+            var data = {
+                type: 'remove',
+                service:'csgosum_plugin',
+                itemName: id
+            }
+            var boundary = String(Math.random()).slice(2);
+            var boundaryMiddle = '--' + boundary + '\r\n';
+            var boundaryLast = '--' + boundary + '--\r\n';
+            var body = ['\r\n'];
+            for (var key in data) {
+              // добавление поля
+              body.push('Content-Disposition: form-data; name="' + key + '"\r\n\r\n' + data[key] + '\r\n');
+            }
             
-                 sendResponse(localStorage.getItem('deleteFavourite'));
-                 localStorage.removeItem('deleteFavourite')
+            body = body.join(boundaryMiddle) + boundaryLast;
+            
+            xhr.open('POST',  'http://csgoback.net/ajax/favourite-edit', false);
+            xhr.setRequestHeader('Content-Type', 'multipart/form-data; boundary=' + boundary);
+            
+            xhr.send(body);
+            
+           
+                    if (xhr.status != 200) {
+                       // обработать ошибку
+                       sendResponse({
+                           action: "NotauthorizeInPage"
+                       })
+                   } else {
+
+                     var response =  JSON.parse(xhr.response);
+                       console.log(response);
+                     sendResponse(response);
+
+                   }
+            
+            return (true);
             
            
             break;

@@ -24,7 +24,7 @@ function initHelper(){
                 addFavoriteBtn();
                 setFavourites(JSON.parse(response[0]));      
                 preloaderStop();
-            },3000)
+            },2000)
                
     }); 
     
@@ -422,18 +422,23 @@ $(document).ready(function(){
         var $this = $(this);
         chrome.runtime.sendMessage({request:'addToFavorites',name:name},function(response){
             console.log(response);
-            if(response[0] == 'true'){
+            if(response.success == true){
                 $this.parents('.inventory-item-hold').addClass('favourite');
-                $this.parents('.inventory-item-hold').attr('data-favorite-id',response[1]);
+                $this.parents('.inventory-item-hold').addClass('favourite-'+response.favoriteId);
+                $this.parents('.inventory-item-hold').attr('data-favorite-id', response.favoriteId);
             }
         })
     })
      $('.side-block').on('click','.removeFavourite',function(e){
          e.preventDefault();
         var id = $(this).parents('.inventory-item-hold').data('favorite-id');
-        console.log(id);
+         var $this = $(this);
+        
          chrome.runtime.sendMessage({request:'removeFavourite', id: id},function(response){
              console.log(response);
+             if(response.success == true){
+                  $('.favourite-'+id).removeClass('favourite');
+             }
          })
      })
 })
