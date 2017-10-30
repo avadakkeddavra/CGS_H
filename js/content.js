@@ -17,10 +17,6 @@ function initHelper(){
            console.log(response);
            
            setServiceList(response[1]);
-<<<<<<< HEAD
-=======
-           //$('.selectable_items').html(response[1]);
->>>>>>> 5813532474503f9d19d897dc402732050df3394f
            $('.helper_preloader').fadeOut();
            $('.helper_container').fadeIn();
            
@@ -40,11 +36,7 @@ function setServiceList(list){
        var servicesHTML = '<option value="'+index+'">'+list[index].selectName+'</option>';
        services += servicesHTML;
     }
-<<<<<<< HEAD
     //console.log(services);
-=======
-    console.log(services);
->>>>>>> 5813532474503f9d19d897dc402732050df3394f
     $('.selectable_items').html(services)
 }
 function preloaderStart(procces){
