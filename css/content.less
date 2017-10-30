@@ -15,6 +15,16 @@ body{
     background-color: #0e232e;
     font-family: 'Oswald', sans-serif;
 }
+.favourite{
+    label{
+        transition: 0.3s;
+        box-shadow: 0px 0px 10px 1px #3fe397;
+        &:hover{
+            transform: scale(1.07);
+        }
+    }
+   
+}
 .helper_modal{
     position: fixed;
     top: 0;
@@ -178,7 +188,7 @@ button{
 .inventory-item-hold{
     position: relative !important;
     user-select: all !important;
-    .addToFavorites{
+    button{
         position: absolute;
         background-color: transparent;
         top: 5px;

@@ -15,7 +15,8 @@ function initHelper(){
     preloaderStart('Loading helper data');
     chrome.runtime.sendMessage({request:'getServiceList'},function(response){
            console.log(response);
-           $('.selectable_items').html(response[1]);
+           
+           setServiceList(response[1]);
            $('.helper_preloader').fadeOut();
            $('.helper_container').fadeIn();
            
@@ -27,6 +28,16 @@ function initHelper(){
                
     }); 
     
+}
+function setServiceList(list){
+    list = JSON.parse(list);
+    var services = '';
+    for(index in list){
+       var servicesHTML = '<option value="'+index+'">'+list[index].selectName+'</option>';
+       services += servicesHTML;
+    }
+    //console.log(services);
+    $('.selectable_items').html(services)
 }
 function preloaderStart(procces){
     $('#simple_preloader').children('.helper_upload_function').text(procces);
@@ -45,6 +56,10 @@ function setFavourites(favouriteList){
         var name = $(this).data('item-name');
          if(favouriteList[name]){
              $(this).addClass('favourite');
+             $(this).find('button').html('<i class="fa fa-trash-o"></i>');
+             $(this).find('button').addClass('removeFavourite');
+             $(this).find('button').removeClass('addToFavorites');
+             $(this).attr('data-favorite-id',favouriteList[name]);
              console.log(favouriteList[name]);                                                          
          }
     })
@@ -251,8 +266,9 @@ $(document).ready(function(){
         $(this).children('i').hide();
         var service = $('.selectable_items').val();
         localStorage.setItem('service',service);
+        
         chrome.runtime.sendMessage({request:'getServiceArray',service:service},function(response){
-            
+            console.log(response);
             setTimeout(function(){
                 localStorage.setItem('serviceArray',response);
                 var data = showPrices(JSON.parse(response));
@@ -387,7 +403,6 @@ $(document).ready(function(){
         var green_perc = $(this).children('.green_pers').html();
         var red_perc = $(this).children('.red_pers').html();
         var image =  $(this).prev().children('img').attr('src');
-        alert(image);
         var servicePrice = $(this).data('service-price');
         
         var title =  $(this).prev().children('img').attr('alt');
@@ -404,10 +419,23 @@ $(document).ready(function(){
         e.preventDefault();
         var name = $(this).parents('label').find('img').attr('alt');
         console.log(name);
+        var $this = $(this);
         chrome.runtime.sendMessage({request:'addToFavorites',name:name},function(response){
-            
+            console.log(response);
+            if(response[0] == 'true'){
+                $this.parents('.inventory-item-hold').addClass('favourite');
+                $this.parents('.inventory-item-hold').attr('data-favorite-id',response[1]);
+            }
         })
     })
+     $('.side-block').on('click','.removeFavourite',function(e){
+         e.preventDefault();
+        var id = $(this).parents('.inventory-item-hold').data('favorite-id');
+        console.log(id);
+         chrome.runtime.sendMessage({request:'removeFavourite', id: id},function(response){
+             console.log(response);
+         })
+     })
 })
 
 
