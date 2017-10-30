@@ -24,10 +24,31 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
             return (true);
                
             
+<<<<<<< HEAD
+=======
+            $.ajax({
+                url:'http://csgoback.net/api/extension?extension=csgosum-helper&type=subscription&subType=default',
+                type:'GET',
+                dataType:'json',
+                success:function(response){
+                    
+                   var services = JSON.stringify(response.servicesData);
+                   localStorage.setItem('csgoback_services', services);
+                   localStorage.setItem('csgoback_favourite', JSON.stringify(response.favourite));
+                   
+                }
+            });
+            var data = [];
+            data[0] = localStorage.getItem('csgoback_favourite');
+            data[1] = localStorage.getItem('csgoback_services')
+            sendResponse(data); 
+        
+>>>>>>> 5813532474503f9d19d897dc402732050df3394f
             break;
         
         case 'getServiceArray':
             var service = request.service;
+<<<<<<< HEAD
 
            var xhr = new XMLHttpRequest();
            xhr.open('GET',  'http://csgoback.net/api/extension?extension=csgosum-helper&type=subscription&subType=loadPrice&service='+service+'&updateTime=60', false);
@@ -46,6 +67,17 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
                }
             
                return (true);
+=======
+                $.ajax({
+                    url:'http://csgoback.net/api/extension?extension=csgosum-helper&type=subscription&subType=loadPrice&service='+service+'&updateTime=60',
+                    type:'GET',
+                    dataType:'json',
+                    success:function(response){
+                       console.log(JSON.stringify(response));
+                       localStorage.setItem('serviceArray',JSON.stringify(response));
+                    }
+                });
+>>>>>>> 5813532474503f9d19d897dc402732050df3394f
             
             break;
             
