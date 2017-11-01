@@ -17,7 +17,7 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
                })
            } else {
                var response =  JSON.parse(xhr.response);
-             sendResponse( Array(JSON.stringify(response.favourite),JSON.stringify(response.servicesData)));
+               sendResponse( Array(JSON.stringify(response.favourite),JSON.stringify(response.servicesData),response.mainSub,response.success));
            }
                 
 
@@ -41,7 +41,7 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
                } else {
                    
                  var response =  JSON.parse(xhr.response);
-                 sendResponse(xhr.response);
+                 sendResponse(response);
                    
                }
             
@@ -92,12 +92,13 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
                         
             break;
         case 'removeFavourite':
-            var id = request.id;            
+            var id = request.id;    
+
             var xhr = new XMLHttpRequest();
             var data = {
                 type: 'remove',
                 service:'csgosum_plugin',
-                itemName: id
+                itemId: id 
             }
             var boundary = String(Math.random()).slice(2);
             var boundaryMiddle = '--' + boundary + '\r\n';
@@ -116,18 +117,12 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
             xhr.send(body);
             
            
-                    if (xhr.status != 200) {
-                       // обработать ошибку
-                       sendResponse({
-                           action: "NotauthorizeInPage"
-                       })
-                   } else {
 
                      var response =  JSON.parse(xhr.response);
-                       console.log(response);
+                     console.log(response);
                      sendResponse(response);
 
-                   }
+    
             
             return (true);
             

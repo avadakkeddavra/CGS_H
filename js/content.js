@@ -8,26 +8,49 @@ function initHelper(){
     var modal = '<div class="helper_modal"><div class="bg_modal_overlay"></div><div id="modal_window"><div class="window_header">Процент перевода <i class="fa fa-close" id="close_window"></i></div><div class="window_body"><img src="" alt="" id="item_image_modal">          <div class="content">  <h3 class="title"></h3>                <p class="minimal_price">Минимальная цена на <span class="service"></span> сейчас: <span class="price"></span></p>      <div class="first_trans">                        <span>CSGoSum</span> > <span class="service">OPSkins.com</span>                         : <span class="percent"></span>                    </div>                    <div class="second_trans">                         <span class="service"></span> > <span>CSGoSum</span> : <span class="percent"></span>                    </div>                </div>            </div>        </div>    </div>';
     var helper_settings = '<div class="helper_settings"><h4>Helper Settings</h4><div class="helper_preloader"></div><div class="helper_container"><div class="helper_settings_header"></div>      <div class="helper_settings_body"><div class="form_block">                        <label for="helper_service">Настроки сервиса</label>                        <div class="helper_select">                                                    <select class="selectable_items">                                                    </select></div> <button class="btn-send" id="upload"><div class="helper_preloader_small"><span class="spin"></span></div><i class="fa fa-money"></i>Upload prices</button></div><button class="btn-template disabled" disabled type="button" id="helper_featured"><i class="fa fa-star-o"></i>Featured</button><button type="button" class="btn-template disabled" disabled id="show_float"><i class="fa fa-eye"></i>Show float</button><div class="helper_sortblock"><div class="sort_block"><label>По процентам:</label><button type="button" disabled class="first_perc disabled desc"><i class="fa fa-sort-amount-asc"></i></button><button type="button" disabled class="disabled second_perc desc"><i class="fa fa-sort-amount-asc"></i></button></div><div class="sort_block"><label>По float:</label><button class="asc disabled" disabled type="button" id="float_sort"><i class="fa fa-sort-numeric-asc"></i></button></div></div></div><div class="helper_preloader_function" id="simple_preloader"><span class="spin"></span><span class="helper_upload_function"></span></div></div>';
     
-    $('body').append(modal);
-    $('#select_bot').after(helper_settings);
+    var error = '<div class="helper_settings danger"><h4>Error</h4><div class="helper_danger"><p class="error_text"></p></div>';
     
     
     preloaderStart('Loading helper data');
     chrome.runtime.sendMessage({request:'getServiceList'},function(response){
            console.log(response);
-           
-           setServiceList(response[1]);
-           $('.helper_preloader').fadeOut();
-           $('.helper_container').fadeIn();
-           
-            setTimeout(function(){
-                addFavoriteBtn();
-                setFavourites(JSON.parse(response[0]));      
+           if(response[3] == true)
+           {
+
+             if(response[2] == true)
+             {
+                $('body').append(modal);
+                $('#select_bot').after(helper_settings);
+
+
+                setServiceList(response[1]);
+               $('.helper_preloader').fadeOut();
+               $('.helper_container').fadeIn();
+               
+                setTimeout(function(){
+                    addFavoriteBtn();
+                    setFavourites(JSON.parse(response[0]));      
+                    preloaderStop();
+                },2000)
+
+             }else{
                 preloaderStop();
-            },2000)
+                $('#select_bot').after(error);
+                errorMessage('Нет подписки')
+             }               
+
+           }else{
+             preloaderStop();
+             $('#select_bot').after(error);
+             errorMessage('Авторизуйтесь на <a href="http://csgoback.net">CSGOBack.net</a>');
+           }
+           
                
     }); 
     
+}
+function errorMessage(text){
+    $('.helper_danger').children('.error_text').html(text);        
 }
 function setServiceList(list){
     list = JSON.parse(list);
@@ -56,6 +79,7 @@ function setFavourites(favouriteList){
         var name = $(this).data('item-name');
          if(favouriteList[name]){
              $(this).addClass('favourite');
+             $(this).addClass('favourite-'+favouriteList[name]);
              $(this).find('button').html('<i class="fa fa-trash-o"></i>');
              $(this).find('button').addClass('removeFavourite');
              $(this).find('button').removeClass('addToFavorites');
@@ -247,15 +271,20 @@ function PercentageSortInArray(value,type){
 $(document).ready(function(){
 
         initHelper();
+        return (true)
 
 })
 $(document).ready(function(){
-    $('.helper_modal .bg_modal_overlay, #close_window').on('click',function(e){
+    setTimeout(function(){
+            $('.helper_modal .bg_modal_overlay, #close_window').on('click',function(e){
+            
+            if($('.helper_modal').is(':visible')){
+                $('.helper_modal').hide();
+            }
+        })
+    },1000);
     
-        if($('.helper_modal').is(':visible')){
-            $('.helper_modal').hide();
-        }
-    })
+
 })
 $(document).ready(function(){
     $('.side-block').on('click','#upload',function(e){
@@ -270,8 +299,7 @@ $(document).ready(function(){
         chrome.runtime.sendMessage({request:'getServiceArray',service:service},function(response){
             console.log(response);
             setTimeout(function(){
-                localStorage.setItem('serviceArray',response);
-                var data = showPrices(JSON.parse(response));
+                var data = showPrices(response);
                 setSummArray(data);
                 console.log(csSumArray);
             },2000)
@@ -291,6 +319,14 @@ $(document).ready(function(){
             $('.inventory-item-hold').not('.favourite').children('label').hide();
             $(this).children('i').removeClass('fa-star-o');
             $(this).children('i').addClass('fa-reply-all');
+        }
+        
+    });
+      $(document).on('keydown',function(e){
+        if(e.keyCode == 27){
+            if($('.helper_modal').is(':visible')){
+                $('.helper_modal').hide();
+            }
         }
         
     })
@@ -424,8 +460,33 @@ $(document).ready(function(){
             console.log(response);
             if(response.success == true){
                 $this.parents('.inventory-item-hold').addClass('favourite');
-                $this.parents('.inventory-item-hold').addClass('favourite-'+response.favoriteId);
-                $this.parents('.inventory-item-hold').attr('data-favorite-id', response.favoriteId);
+                $this.parents('.inventory-item-hold').addClass('favourite-'+response.favouriteId);
+                $this.parents('.inventory-item-hold').attr('data-favorite-id', response.favouriteId);
+                $this.html('<i class="fa fa-trash-o"></i>');
+                $this.addClass('removeFavourite');
+                $this.removeClass('addToFavorites');
+                var nextSkin = $this.parents('.inventory-item-hold').next();
+              
+                while(true){
+
+                    var nextSkinName = nextSkin.find('label').find('img').attr('alt');
+                    console.log('next='+nextSkinName,'curr='+name);
+                    if(nextSkinName == name){
+                        nextSkin.addClass('favourite');
+                        nextSkin.addClass('favourite-'+response.favouriteId);
+                        nextSkin.attr('data-favorite-id', response.favouriteId);
+                        nextSkin.find('button').html('<i class="fa fa-trash-o"></i>');
+                        nextSkin.find('button').addClass('removeFavourite');
+                        nextSkin.find('button').removeClass('addToFavorites');
+                        
+                        var nextSkin = nextSkin.next();
+                    }else{
+
+                        break;
+
+                    }
+                
+                }
             }
         })
     })
@@ -438,6 +499,10 @@ $(document).ready(function(){
              console.log(response);
              if(response.success == true){
                   $('.favourite-'+id).removeClass('favourite');
+                    $('.favourite-'+id).find('button').html('<i class="fa fa-star-o"></i>');
+                    $('.favourite-'+id).find('button').addClass('addToFavorites');
+                    $('.favourite-'+id).find('button').removeClass('removeFavourite');
+                    $('.favourite-'+id).find('button').parents('.inventory-item-hold').removeAttr('data-favorite-id');
              }
          })
      })

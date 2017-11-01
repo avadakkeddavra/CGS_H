@@ -14,7 +14,7 @@
 }
 body {
   background-color: #0e232e;
-  font-family: 'Oswald', sans-serif;
+/*font-family: 'Oswald', sans-serif;*/
 }
 .favourite label {
   transition: 0.3s;
@@ -235,9 +235,18 @@ button {
 }
 .helper_settings {
   padding: 20px 50px;
-  background-color: #fff;
   background-color: #136a8c;
   border-bottom: 2px solid #2195db;
+}
+.helper_settings.danger{
+  background-color: #d04a4a;
+  border:none;
+}
+.helper_settings.danger p{
+  font-size: 12px;
+  margin-top: 20px;
+  text-transform: uppercase;
+  color: #fff;
 }
 .helper_settings h4 {
   color: #e3e3e3;
