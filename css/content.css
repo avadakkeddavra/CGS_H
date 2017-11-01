@@ -198,6 +198,18 @@ button {
   border: none;
   color: #3fe397;
 }
+.inventory-item .right-stickers{
+  z-index: 0  !important;
+}
+.inventory-item-hold .helper_link{
+  position: absolute;
+  background-color: transparent;
+  top: 25px;
+  right: 5px;
+  font-size: 15px;
+  border: none;
+  color: #3fe397
+}
 .helper_row {
   margin-bottom: 40px;
 }

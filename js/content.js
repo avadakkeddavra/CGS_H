@@ -107,9 +107,17 @@ function addFavoriteBtn(){
         data['float'] = attrFloat;
         data['item'] = $(this);
         floatsArray[i] = data;
+
+        
+        var name = String($(this).find('img').attr('alt'));
+        
+        name = name.replace(' ','+');
+        name = name.replace('|','%7C');
+        var link = 'https://opskins.com/?loc=shop_search&app=730_2&search_item='+name+'&sort=lh';
         $(this).attr('data-float',Number(attrFloat));
         $(this).children('label').append('<div class="helper_float">Float: <span class="float_value">'+floats[i]+'</span></div>')
         $(this).children('label').children('.inventory-price').after('<button class="addToFavorites"><i class="fa fa-star-o"></i></button>');
+        $(this).children('label').children('.inventory-price').after('<a href="'+link+'" target="_blank" class="helper_link"><i class="fa fa-paper-plane-o"></i></a>');
         
     })
     
